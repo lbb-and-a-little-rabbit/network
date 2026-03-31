@@ -2,3 +2,5 @@ client
 server
 .vscode
 build/
+windows_exe
+linux_elf
